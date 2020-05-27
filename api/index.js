@@ -60,6 +60,50 @@ app.get('/user', function (req, res) {
     });
 
 });
+
+//s'inscrire
+app.post("/utilisateur", (req, res) => {
+    connection.connect(function (err) {
+        // in case of error
+        if (err) {
+            console.log(err.code);
+            console.log(err.fatal);
+        }
+    });
+    //let utilisateur = JSON.stringify(req.body);
+    console.log(req.body);
+    let utilisateur = req.body;
+
+
+    let query = `SELECT * FROM user where 'email' = "${utilisateur.email}" `
+    connection.query(query, (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(404).send(err);
+        } else {
+            if (result > 0) {
+                res.status(403).send("le compte existe déjà")
+            } else {
+                const salt = bcrypt.genSaltSync(4);
+                const hash = bcrypt.hashSync(utilisateur.password, salt);
+                let query2 = `INSERT INTO user (email,nom,prenom,mdp) VALUES ('${utilisateur.email}','${utilisateur.nom}','${utilisateur.prenom}','${hash}')`;
+
+                connection.query(query2, (err, result) => {
+                    if (err) {
+                        console.error(err);
+                        res.status(404).send(err);
+                    } else {
+                        res.status(201).send("créer");
+                    }
+                })
+            }
+        }
+    })
+})
+
+
+
+//se connecter 
 app.post("/connect", (req, res) => {
     connection.connect(function (err) {
         // in case of error
@@ -83,10 +127,10 @@ app.post("/connect", (req, res) => {
             if (result >= 0) {
                 res.status(404).send("email ou mot de passe invalide");
             } else {
-                if (utilisateur.password !== result[0].mdp) {
+
+
+                if (!bcrypt.compareSync(utilisateur.password, result[0].mdp)) {
                     res.status(404).send("email ou mot de passe invalide");
-                    /*if (!bcrypt.compareSync(utilisateur.password, result[0].mdp)) {
-                        res.status(404).send("email ou mot de passe invalide");*/
                 } else {
                     res.status(200).send("connexion accepté");
                 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="event">
 <form
   id="app"
   @submit="checkForm"
@@ -84,7 +84,7 @@ Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 export default {
-  name: "HelloWorld",
+  name: "event",
  components: {
       LMap,
       LTileLayer,
