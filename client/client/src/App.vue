@@ -17,11 +17,13 @@
         <div class="navbar-nav">
           <router-link class="nav-item nav-link" to="/">Home</router-link>
 
-          <router-link class="nav-item nav-link" to="/about">Evenements</router-link>
+          <router-link class="nav-item nav-link" to="/levent">Evenements</router-link>
 
-          <router-link class="nav-item nav-link" to="/about">Profil</router-link>
+          <router-link class="nav-item nav-link" to="/profil">Profil</router-link>
+          <button type="button" class="btn btn-primary btn-sm" v-on:click="creer">Créer un événement</button>
         </div>
       </div>
+
       <ul class="nav navbar-nav flex-row justify-content-between ml-auto">
         <li class="nav-item order-2 order-md-1">
           <a href="#" class="nav-link" title="settings">
@@ -76,7 +78,7 @@
         </li>
       </ul>
     </nav>
-    <router-view />
+
     <div id="id01" class="modal">
       <span
         onclick="document.getElementById('id01').style.display='none'"
@@ -121,6 +123,7 @@
         </div>
       </form>
     </div>
+    <router-view />
   </div>
 </template>
 <script>
@@ -147,11 +150,14 @@ export default {
           password: this.pass
         })
         .then(res => {
-          console.log(res.data);
+          localStorage.id = res.data;
         })
         .catch(err => {
           console.log(err);
         });
+    },
+    creer() {
+      this.$router.push({ name: "Evenement" });
     },
     iscription() {
       axios
@@ -167,9 +173,50 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    log() {
+      var browsers = [
+        "Firefox",
+        "MSIE",
+        "Trident",
+        "Edge",
+        "Chrome",
+        "Safari",
+        "Android"
+      ];
+
+      function getBrowser() {
+        var ua = navigator.userAgent;
+        for (var b in browsers) {
+          b = browsers[b];
+          if (ua.indexOf(b) != -1) return b;
+        }
+        return false;
+      }
+
+      var browser = getBrowser();
+      if (browser == "Trident" || browser == "MSIE") browser = "IE/Edge";
+      if (browser === false) {
+        document.write("Navigateur inconnu.");
+      } else {
+        axios
+          .post("http://localhost:3000/log", {
+            navigateur: browser,
+            plateform: navigator.platform
+          })
+          .then(res => {
+            console.log(res.data);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
     }
   },
-  computed: {}
+  computed: {},
+  mounted() {
+    this.log();
+  }
 };
 </script>
 <style>
